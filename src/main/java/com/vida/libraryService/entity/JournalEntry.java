@@ -1,8 +1,7 @@
 package com.vida.libraryService.entity;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,21 +9,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.Date;
 
-@Document(collection = "journal_entries")
+@Document(collection = "${collection.name}")
+@Getter
+@Setter
+@Data
+//@AllArgsConstructor
+//@NoArgsConstructor
+//@Builder
+//@Slf4j
+//@ToString
+//@EqualsAndHashCode
 public class JournalEntry {
 
     @Id
-    @Getter
-    @Setter
     private ObjectId id;
-    @Getter
-    @Setter
+
     private String title;
-    @Getter
-    @Setter
+
     private String content;
-    @Getter
-    @Setter
+
     private LocalDateTime date;
 
 }
