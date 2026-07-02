@@ -2,7 +2,9 @@ package com.vida.libraryService.controller;
 
 
 import com.vida.libraryService.entity.JournalEntry;
+import com.vida.libraryService.entity.User;
 import com.vida.libraryService.service.JournalEntryService;
+import com.vida.libraryService.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,9 +22,13 @@ public class JournalAppController {
     @Autowired
     private JournalEntryService journalEntryService;
 
-    @GetMapping
-    public ResponseEntity<?> getAll(){
-        List<JournalEntry> all = journalEntryService.getAllJournals();
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/{userName}")
+    public ResponseEntity<?> getAllJournalEntriesOfUser(@PathVariable String userName){
+        User byuserName = userService.getUserbyUserName(userName);
+        List<JournalEntry> all = byuserName.getJournalEntries();
         if(all!=null && !all.isEmpty()){
             return new ResponseEntity<>(all,HttpStatus.OK);
         }else{
@@ -30,10 +36,10 @@ public class JournalAppController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<?> createJournal(@RequestBody JournalEntry entry){
+    @PostMapping("/{userName}")
+    public ResponseEntity<?> createJournal(@RequestBody JournalEntry entry, @PathVariable String userName){
         try{
-            journalEntryService.saveEntry(entry);
+            journalEntryService.saveEntry(entry, userName);
             return new ResponseEntity<>(entry, HttpStatus.CREATED);
         }catch(Exception e){
             return new ResponseEntity<>("Please check the request again;",HttpStatus.BAD_REQUEST);
@@ -51,9 +57,9 @@ public class JournalAppController {
         }
     }
 
-    @DeleteMapping("/id/{myId}")
-    public ResponseEntity<?> deletebyId(@PathVariable ObjectId myId){
-        journalEntryService.deleteEntrybyId(myId);
+    @DeleteMapping("/id/{userName}/{myId}")
+    public ResponseEntity<?> deletebyId(@PathVariable ObjectId myId, @PathVariable String userName){
+        journalEntryService.deleteEntrybyId(myId, userName);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -61,12 +67,12 @@ public class JournalAppController {
     public ResponseEntity<?> updateJournal(@PathVariable ObjectId id,@RequestBody JournalEntry entry){
         JournalEntry old = journalEntryService.getJournalbyId(id).orElse(null);
 
-        if(old!=null){
-            old.setTitle(entry.getTitle()!= null && !entry.getTitle().equals("") ? entry.getTitle() : old.getTitle());
-            old.setContent(entry.getContent()!= null && !entry.getContent().equals("") ? entry.getContent() : old.getContent());
-            journalEntryService.saveEntry(old);
-            return new ResponseEntity<>(old, HttpStatus.OK);
-        }
+//        if(old!=null){
+//            old.setTitle(entry.getTitle()!= null && !entry.getTitle().equals("") ? entry.getTitle() : old.getTitle());
+//            old.setContent(entry.getContent()!= null && !entry.getContent().equals("") ? entry.getContent() : old.getContent());
+//            journalEntryService.saveEntry(old);
+//            return new ResponseEntity<>(old, HttpStatus.OK);
+//        }
         return new ResponseEntity<>("Content Not Found",HttpStatus.NOT_FOUND);
 
     }

@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Document(collection = "${collection.name}")
-@Getter
-@Setter
+//@Getter
+//@Setter
 @Data
 //@AllArgsConstructor
-//@NoArgsConstructor
+@NoArgsConstructor
 //@Builder
 //@Slf4j
 //@ToString
@@ -24,6 +24,7 @@ public class JournalEntry {
     @Id
     private ObjectId id;
 
+    @NonNull
     private String title;
 
     private String content;

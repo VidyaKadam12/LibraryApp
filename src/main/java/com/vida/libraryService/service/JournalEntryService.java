@@ -1,6 +1,7 @@
 package com.vida.libraryService.service;
 
 import com.vida.libraryService.entity.JournalEntry;
+import com.vida.libraryService.entity.User;
 import com.vida.libraryService.repository.JournalEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +18,15 @@ public class JournalEntryService {
     // even for the interface springboot will create bean and implement all methods at runtime
     private JournalEntryRepository journalEntryRepository;
 
-    public JournalEntry saveEntry(JournalEntry journalEntry){
+    @Autowired
+    private UserService userService;
+
+    public void saveEntry(JournalEntry journalEntry, String userName){
+        User user = userService.getUserbyUserName(userName);
         journalEntry.setDate(LocalDateTime.now());
-        return journalEntryRepository.save(journalEntry);
+        JournalEntry saved = journalEntryRepository.save(journalEntry);
+        user.getJournalEntries().add(saved);
+        userService.saveUser(user);
     }
 
     public List<JournalEntry> getAllJournals(){
@@ -30,7 +37,11 @@ public class JournalEntryService {
         return journalEntryRepository.findById(id);
     }
 
-    public void deleteEntrybyId(ObjectId id){
+    public void deleteEntrybyId(ObjectId id, String userName){
+        User user = userService.getUserbyUserName(userName);
+        Optional<JournalEntry> entryToRemove = journalEntryRepository.findById(id);
+        user.getJournalEntries().remove(entryToRemove);
+        userService.saveUser(user);
         journalEntryRepository.deleteById(id);
     }
 
