@@ -63,16 +63,16 @@ public class JournalAppController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateJournal(@PathVariable ObjectId id,@RequestBody JournalEntry entry){
+    @PutMapping("/{username}/{id}")
+    public ResponseEntity<?> updateJournal(@PathVariable String userName,@PathVariable ObjectId id,@RequestBody JournalEntry entry){
         JournalEntry old = journalEntryService.getJournalbyId(id).orElse(null);
 
-//        if(old!=null){
-//            old.setTitle(entry.getTitle()!= null && !entry.getTitle().equals("") ? entry.getTitle() : old.getTitle());
-//            old.setContent(entry.getContent()!= null && !entry.getContent().equals("") ? entry.getContent() : old.getContent());
-//            journalEntryService.saveEntry(old);
-//            return new ResponseEntity<>(old, HttpStatus.OK);
-//        }
+        if(old!=null){
+            old.setTitle(entry.getTitle()!= null && !entry.getTitle().equals("") ? entry.getTitle() : old.getTitle());
+            old.setContent(entry.getContent()!= null && !entry.getContent().equals("") ? entry.getContent() : old.getContent());
+            journalEntryService.saveEntry(old);
+            return new ResponseEntity<>(old, HttpStatus.OK);
+        }
         return new ResponseEntity<>("Content Not Found",HttpStatus.NOT_FOUND);
 
     }
