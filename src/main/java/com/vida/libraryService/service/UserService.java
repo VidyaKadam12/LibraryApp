@@ -1,7 +1,9 @@
 package com.vida.libraryService.service;
 
 
+import com.vida.libraryService.entity.JournalEntry;
 import com.vida.libraryService.entity.User;
+import com.vida.libraryService.repository.JournalEntryRepository;
 import com.vida.libraryService.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +23,24 @@ public class UserService {
     // even for the interface springboot will create bean and implement all methods at runtime
     private UserRepository userRepository;
 
+    @Autowired
+    private JournalEntryRepository journalEntryRepository;
+
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public User saveNUser(User user){
+    public User saveUser(User user){
         return userRepository.save(user);
     }
 
-    public User saveUser(User user){
+    public User saveNewUser(User user){
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Arrays.asList("USER"));
+        return userRepository.save(user);
+    }
+
+    public User saveAdmin(User user){
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("USER","ADMIN"));
         return userRepository.save(user);
     }
 
@@ -47,6 +58,15 @@ public class UserService {
 
     public void deleteUserbyId(ObjectId id){
         userRepository.deleteById(id);
+    }
+
+    public void deleteUserbyName(String userName){
+        User user = userRepository.findByUserName(userName);
+        List<JournalEntry> entries = user.getJournalEntries();
+        for(JournalEntry entry: entries){
+                journalEntryRepository.delete(entry);
+        }
+        userRepository.deleteByUserName(userName);
     }
 
 

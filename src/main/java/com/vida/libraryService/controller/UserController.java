@@ -2,11 +2,14 @@ package com.vida.libraryService.controller;
 
 
 import com.vida.libraryService.entity.User;
+import com.vida.libraryService.repository.UserRepository;
 import com.vida.libraryService.service.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,26 +24,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public ResponseEntity<?> getAll(){
-        List<User> all = userService.getAllUsers();
-        if(all!=null && !all.isEmpty()){
-            return new ResponseEntity<>(all,HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>("No User Found",HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User user){
-        try{
-            userService.saveUser(user);
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
-        }catch(Exception e){
-            return new ResponseEntity<>("Please check the request again;",HttpStatus.BAD_REQUEST);
-        }
-
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/id/{myId}")
     public ResponseEntity<?> getbyId(@PathVariable ObjectId myId){
@@ -52,23 +37,23 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/id/{myId}")
-    public ResponseEntity<?> deletebyId(@PathVariable ObjectId myId){
-        userService.deleteUserbyId(myId);
+    @DeleteMapping
+    public ResponseEntity<?> deletebyUsername(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        userService.deleteUserbyName(authentication.getName());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{userName}")
-    public ResponseEntity<?> updateJournal(@PathVariable ObjectId id,@RequestBody User user){
-        User old = userService.getUserbyUserName(user.getUserName());
-
-        if(old!=null){
-            old.setUserName(user.getUserName());
-            old.setPassword(user.getPassword());
-            userService.saveUser(old);
-            return new ResponseEntity<>(old, HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Content Not Found",HttpStatus.NOT_FOUND);
+    @PutMapping
+    public ResponseEntity<?> updateJournal(@RequestBody User user){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User old = userService.getUserbyUserName(username);
+        old.setUserName(user.getUserName());
+        old.setPassword(user.getPassword());
+        userService.saveUser(old);
+        //return new ResponseEntity<>(old, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
 

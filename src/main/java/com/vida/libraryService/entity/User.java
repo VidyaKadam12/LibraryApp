@@ -1,6 +1,7 @@
 package com.vida.libraryService.entity;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "users")
+@AllArgsConstructor
 @Data
 public class User {
 
@@ -25,6 +27,11 @@ public class User {
 
     @NonNull
     private String password;
+
+    public User(String userName, String password){
+        this.userName = userName;
+        this.password = password;
+    }
 
     @DBRef
     private List<JournalEntry> journalEntries = new ArrayList<>();

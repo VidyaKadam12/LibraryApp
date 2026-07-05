@@ -13,6 +13,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,10 +29,10 @@ public class Security  {
     @Autowired
     private final UserDetailsServiceImpl userDetailsServiceImpl;
 
-    @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return new UserDetailsServiceImpl(userRepository, passwordEncoder);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+//        return new UserDetailsServiceImpl(userRepository, passwordEncoder);
+//    }
 
 
 
@@ -39,11 +40,13 @@ public class Security  {
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationProvider authenticationProvider) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/journal/**").authenticated()
+                        .requestMatchers("/journal/**","/user/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .authenticationProvider(authenticationProvider);
-        http.csrf(AbstractHttpConfigurer::disable);
+        http.sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).csrf(csrf -> csrf.disable());
 
         return http.build();
         }
