@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "users")
-@AllArgsConstructor
 @Data
 public class User {
 

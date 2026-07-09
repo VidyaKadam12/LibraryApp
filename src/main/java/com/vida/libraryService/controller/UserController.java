@@ -3,7 +3,9 @@ package com.vida.libraryService.controller;
 
 import com.vida.libraryService.entity.User;
 import com.vida.libraryService.repository.UserRepository;
+import com.vida.libraryService.response.WeatherResponse;
 import com.vida.libraryService.service.UserService;
+import com.vida.libraryService.service.WeatherService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private WeatherService weatherService;
 
     @GetMapping("/id/{myId}")
     public ResponseEntity<?> getbyId(@PathVariable ObjectId myId){
@@ -55,6 +60,18 @@ public class UserController {
         //return new ResponseEntity<>(old, HttpStatus.OK);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getbyUsername(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        WeatherResponse weatherResponse = weatherService.getWeather("Mumbai");
+        String greeting ="";
+        if(weatherResponse!=null){
+            greeting = "Weather feels like " + weatherResponse.getCurrent().getFeelslike();
+        }
+        String userName = authentication.getName();
+        return new ResponseEntity<>("Hi " + userName +" "+ greeting ,HttpStatus.OK);
     }
 
 }
