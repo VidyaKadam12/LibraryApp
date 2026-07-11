@@ -27,7 +27,7 @@ public class JournalEntryService {
     @Autowired
     private UserService userService;
 
-    @Transactional
+    //@Transactional
     public void saveEntry(JournalEntry journalEntry, String userName){
         User user = userService.getUserbyUserName(userName);
         journalEntry.setDate(LocalDateTime.now());

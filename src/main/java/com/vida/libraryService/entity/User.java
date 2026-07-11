@@ -3,6 +3,7 @@ package com.vida.libraryService.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -15,6 +16,8 @@ import java.util.List;
 
 @Document(collection = "users")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -24,13 +27,12 @@ public class User {
     @Indexed(unique = true) //indexing for faster research
     private String userName;
 
+    private String email;
+
+    private boolean sentimentAnalysis;
+
     @NonNull
     private String password;
-
-    public User(String userName, String password){
-        this.userName = userName;
-        this.password = password;
-    }
 
     @DBRef
     private List<JournalEntry> journalEntries = new ArrayList<>();
